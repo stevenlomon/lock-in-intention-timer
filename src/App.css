@@ -1,0 +1,139 @@
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    
+    /* Pushing it slightly above the horizontal middle line */
+    transform: translateY(-10vh);
+}
+
+.time-display {
+    /* Monospace is critical for timers so the width of '1' and '0' are identical, 
+       preventing horizontal jittering when ticking down */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 8rem;
+    font-weight: bold;
+    letter-spacing: 0.2rem;
+    
+    /* Removing the default outline when the user clicks to edit */
+    outline: none;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.2s ease-in-out;
+}
+
+/* Structural feedback when the user is actively editing the buffer */
+.time-display:focus {
+    border-bottom: 2px solid #555;
+}
+
+/* NEW: Hint at the input nature of the Timer! */
+.time-display:hover {
+    cursor: text; /* Changes the mouse pointer to the 'I-beam' text cursor */
+    border-bottom: 2px solid #333; /* A subtle hint that it's an input field */
+}
+
+.control-btn {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.control-btn:hover {
+    background-color: #555;
+}
+
+.control-btn:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================
+   Intention UI
+   ========================================== */
+.intention-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 500px; /* Prevents the input from stretching too far on wide screens */
+}
+
+.intention-prompt {
+    font-size: 1.1rem;
+    color: #a0a0a0; /* A muted gray to keep hierarchy focused on the timer */
+    text-align: center;
+}
+
+.intention-input {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #333;
+    color: #f2f2f2;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 0.5rem;
+    font-family: inherit;
+    transition: border-bottom 0.2s ease-in-out;
+
+    /* NEW: Defensive Textarea Properties */
+    resize: none; /* Prevents the user from dragging and breaking your layout */
+    overflow-y: hidden; /* Hides the native scrollbar */
+}
+
+/* Structural feedback when the user is actively typing their intention */
+.intention-input:focus {
+    outline: none;
+    border-bottom: 2px solid #888;
+}
+
+/* The "Locked" state (to be triggered by JS later) */
+.intention-input:disabled {
+    color: #555;
+    border-bottom: 2px solid transparent;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   Controls UI (Preventing Layout Shift)
+   ========================================== */
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    
+    /* We don't need to hardcode a height! The 'visibility' property below 
+       handles the space allocation perfectly. */
+}
+
+/* The Structural Duality of Hiding Elements:
+   display: none = Removes element from the layout entirely (Causes jumping)
+   visibility: hidden = Makes it invisible, but it still takes up exact physical space! */
+.invisible {
+    visibility: hidden;
+    pointer-events: none; /* Defensive: Prevents accidental invisible clicks */
+}
+
+/* ==========================================
+   Error/Warning UI
+   ========================================== */
+.error-display {
+    /* Pre-allocate the exact height of the text (1.1rem font-size + line-height).
+       This ensures the bounding box never collapses to 0 pixels when the string is empty. */
+    min-height: 1.5rem; 
+    
+    /* Optional: A soft, pragmatic red color to distinguish it from the standard gray prompt */
+    color: #bb3f3f; 
+}
+
+.warning-display { 
+    min-height: 1.5rem; 
+    color: #c67d3d; 
+}

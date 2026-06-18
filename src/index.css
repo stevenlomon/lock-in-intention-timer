@@ -1,0 +1,19 @@
+/* Structural Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* A light shade of black */
+    background-color: #1a1a1a; 
+    color: #f2f2f2;
+    font-family: system-ui, -apple-system, sans-serif;
+    
+    /* Flexbox protocol to center the container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
