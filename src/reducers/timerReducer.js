@@ -13,7 +13,7 @@ const initialState = {
 };
 
 // The actual reducer. Strictly dictates how the state is ALLOWED to change
-function timerReducer(state, action) {
+export function timerReducer(state, action) {
   switch (action.type) {
     case 'START_TIMER':
       // Only allow starting if we are currently at START or PAUSED
