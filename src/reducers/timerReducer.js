@@ -7,6 +7,14 @@ export const APP_STATES = {
   END: 'END'
 };
 
+export const APP_ACTIONS = {
+  START_TIMER: 'START_TIMER',
+  PAUSE_TIMER: 'PAUSE_TIMER',
+  TICK: 'TICK',
+  FINISH_TIMER: 'FINISH_TIMER',
+  RESET_TIMER: 'RESET_TIMER'
+};
+
 const initialState = {
   status: APP_STATES.START,
   totalSeconds: 2700, // 45:00

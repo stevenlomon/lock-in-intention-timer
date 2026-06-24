@@ -1,7 +1,7 @@
 import { useState, useEffect, useReducer } from 'react';
-import { APP_STATES, timerReducer } from "./../reducers/timerReducer"; 
-// import { StorageManager } from "./../utils/StorageManager";
-// import { AudioEngine } from "./../utils/AudioEngine";
+import { APP_STATES, APP_ACTIONS, timerReducer } from "./../reducers/timerReducer"; 
+import { StorageManager } from "./../utils/StorageManager";
+import { AudioEngine } from "./../utils/AudioEngine";
 
 export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 minutes
   // const [totalSeconds, setTotalSeconds] = useState(initialSeconds);
@@ -37,11 +37,12 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
   };
 
   const pause = () => {
-    // To be implemented
+    dispatch({ type: APP_ACTIONS.PAUSE_TIMER });
   };
 
   const reset = () => {
-    // To be implemented
+    dispatch({ type: APP_ACTIONS.RESET_TIMER });
+    StorageManager.clearSession(); // Reset the timer and clear localStorage!
   };
 
   // In the Vanilla JS version, we needed to define a haltBrowserAPI method. 
