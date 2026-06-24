@@ -31,7 +31,7 @@ const Controls = ({ appStatus, onStart, onPause, onReset }) => {
 
       {/* The Reset Button */}
       {(appStatus === APP_STATES.RUNNING || appStatus === APP_STATES.PAUSED) && (
-        <button className="control-btn invisible" onClick={onReset}>
+        <button className="control-btn" onClick={onReset}>
           Reset
         </button>
       )}
