@@ -51,13 +51,21 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
   // And now furthermore with our reducer, functions that call dispatch to the reducer! The reducer defines the actions, here's where we define the functions that use the actions
   const start = (validatedSeconds) => {
     // The translation of this line of code from the Vanilla JS version `StateBuffer.endTime = Date.now() + (StateBuffer.totalSeconds * 1000);` becomes...
-    endTimeRef.current = Date.now() + validatedSeconds * 1000; // Absolute end time in milliseconds
+    endTimeRef.current = Date.now() + validatedSeconds * 1000; // Absolute end time in milliseconds. With our new CONTINUE_TIMER action, validatedSeconds is never undefined here anymore causing NaN cascades
     
     dispatch({ type: APP_ACTIONS.START_TIMER, payload: validatedSeconds });
   };
 
   const pause = () => {
     dispatch({ type: APP_ACTIONS.PAUSE_TIMER });
+  };
+
+  // The new function linked to our new reducer action
+  const resume = () => { // `continue` is a reserved keyword in JavaScript haha
+    // Push the absolute end time further into the future based on the frozen seconds! I.. completely missed this. Not including this causes a new bug where the timer seemingly continues to tick even in a PAUSED state. This line is the final puzzle piece to get it working just as intended
+    endTimeRef.current = Date.now() + (state.totalSeconds * 1000);
+
+    dispatch({ type: APP_ACTIONS.CONTINUE_TIMER });
   };
 
   const reset = () => {
@@ -74,6 +82,7 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
     totalSeconds: state.totalSeconds,
     start,
     pause,
+    resume,
     reset
   }
 };
