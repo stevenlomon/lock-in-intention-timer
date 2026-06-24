@@ -75,7 +75,7 @@ function App() {
               )
             }
         </label>
-        <IntentionInput intentionValue={intentionText} onIntentionEdit={setIntentionText} />
+        <IntentionInput appStatus={status} intentionValue={intentionText} onIntentionEdit={setIntentionText} />
         {/* For debugging purposes only: intention value is currently {intentionText} */}
 
       </div>

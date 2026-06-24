@@ -1,4 +1,6 @@
-const IntentionInput = ({ intentionValue, onIntentionEdit }) => {
+import { APP_STATES } from "../reducers/timerReducer";
+
+const IntentionInput = ({ appStatus, intentionValue, onIntentionEdit }) => {
   return (
     <textarea
       className="intention-input"
@@ -8,6 +10,7 @@ const IntentionInput = ({ intentionValue, onIntentionEdit }) => {
       rows={1}
       value={intentionValue}
       onChange={(e) => onIntentionEdit(e.target.value)}
+      disabled={appStatus === APP_STATES.START ? false : true}
     />
   )
 };

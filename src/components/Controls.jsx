@@ -1,4 +1,4 @@
-import { APP_STATES } from "../reducers/timerReducer"
+import { APP_STATES } from "../reducers/timerReducer";
 
 const Controls = ({ appStatus, onStart, onPause, onReset }) => {
   // Rather than having a ternary waterfall like this which.. it works and it's a good instinctive attempt! But it's quite hard to read and look at
