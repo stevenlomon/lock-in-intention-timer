@@ -9,10 +9,9 @@ import Controls from "./components/Controls";
 
 function App() {
   const { status, totalSeconds, start, pause, reset } = useTimerEngine();
-
-  // For our controlled inputs
   const [timerInput, setTimerInput] = useState("45:00");
   const [intentionText, setIntentionText] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // The `start` function from useTimerEngine expects validated seconds, it doesn't do the validation anymore like in the Vanilla JS version!
   function handleStart() {
@@ -25,8 +24,15 @@ function App() {
 
     const validationResult = Validator.validateInput(timerInput, intentionText);
 
+    if (!validationResult.isValid) {
+      // If the validation result is not valid, we update the error state and return early
+      setErrorMessage(validationResult.error);
+      return;
+    }
+
     // Start with validated seconds!
     start(validationResult.seconds);
+    setErrorMessage("");
   }
 
   return (
@@ -57,6 +63,7 @@ function App() {
       </div>
 
       <div className='controls-container'>
+        {errorMessage && <span className='error-display'>{errorMessage}</span>}
         <Controls appStatus={status} onStart={handleStart} onPause={pause} onReset={reset} />
         {/* Now with handleStart instead of just start */}
         {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` */}
