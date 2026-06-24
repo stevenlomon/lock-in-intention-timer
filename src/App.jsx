@@ -53,7 +53,7 @@ function App() {
 
   return (
     <div className='timer-container'>
-      <TimeDisplay timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
+      <TimeDisplay appStatus={status} timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
       {/* Now with handleTimerEdit instead of setTimerInput. No changes needed in TimeDisplay! */}
       {/* And now also with a conditional timerValue!! timerInput only when the user is typing, the formatted totalSeconds from the engine once the engine is running! */}
       {/* For debugging purposes only: timer value is currently {timerInput} */}

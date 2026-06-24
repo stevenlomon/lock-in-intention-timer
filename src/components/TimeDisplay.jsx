@@ -1,8 +1,10 @@
-const TimeDisplay = ({ timerValue, onTimerEdit }) => {
+import { APP_STATES } from "../reducers/timerReducer";
+
+const TimeDisplay = ({ appStatus, timerValue, onTimerEdit }) => {
   return (
     <div
       className='time-display'
-      contentEditable={true}
+      contentEditable={appStatus === APP_STATES.START}
       suppressContentEditableWarning={true} // Special React property to signal to React "Hey, I know we're touching the DOM here but I know what I'm doing"
       spellCheck={false}
       // onChange={(e) => onTimerEdit(e.target.value)} This that is ingrained in my muscle memory at this poitn would be valid.. if we had an input! But here we have a div
