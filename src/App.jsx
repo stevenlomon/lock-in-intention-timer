@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTimerEngine } from './hooks/useTimerEngine';
 import { APP_STATES } from './reducers/timerReducer';
 import { Validator } from './utils/Validator';
+import { TimeParser } from './utils/TimeParser';
 import TimeDisplay from "./components/TimeDisplay";
 import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
@@ -12,6 +13,7 @@ function App() {
   const [timerInput, setTimerInput] = useState("45:00");
   const [intentionText, setIntentionText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
 
   // The `start` function from useTimerEngine expects validated seconds, it doesn't do the validation anymore like in the Vanilla JS version!
   function handleStart() {
@@ -33,11 +35,25 @@ function App() {
     // Start with validated seconds!
     start(validationResult.seconds);
     setErrorMessage("");
-  }
+  };
+
+  // This functions triggers upon the `onBlur` in TimeDisplay; the direct equivalent to the `timeDisplay.addEventListener('blur', () => {` line that altered my brain chemistry in the Vanilla VS version haha
+  // So TimeDisplay won't have setTimerInput directly as its onTimerEdit prop anymore, instead..
+  function handleTimerEdit(newText) {
+    // ..it is called here
+    setTimerInput(newText);
+
+    // The text is parsed into primitive integers with the help of our Vanilla JS TimeParser..
+    const parsedSeconds = TimeParser.parseToSeconds(newText);
+
+    // ..and if it's above 3600 (an hour), we display the warning message!
+    setShowWarning(parsedSeconds > 3600); 
+  };
 
   return (
     <div className='timer-container'>
-      <TimeDisplay timerValue={timerInput} onTimerEdit={setTimerInput} />
+      <TimeDisplay timerValue={timerInput} onTimerEdit={handleTimerEdit} />
+      {/* Now with handleTimerEdit instead of setTimerInput. No changes needed in TimeDisplay! */}
       {/* For debugging purposes only: timer value is currently {timerInput} */}
 
       <div className='intention-container'>
@@ -63,13 +79,20 @@ function App() {
       </div>
 
       <div className='controls-container'>
-        {errorMessage && <span className='error-display'>{errorMessage}</span>}
+        {errorMessage && <span className='intention-promp error-display'>{errorMessage}</span>}
+        
+        {showWarning && (
+          <span className='intention-prompt warning-display'>
+            It is recommended to keep your focus sessions to 60 minutes or less per session
+          </span>
+        )}
+
         <Controls appStatus={status} onStart={handleStart} onPause={pause} onReset={reset} />
         {/* Now with handleStart instead of just start */}
         {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` */}
       </div>
     </div>
   )
-}
+};
 
-export default App
+export default App;
