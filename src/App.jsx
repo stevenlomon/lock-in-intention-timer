@@ -51,6 +51,13 @@ function App() {
     setShowWarning(parsedSeconds > 3600); 
   };
 
+  // UX improvement: reset the UI when hitting "Reset" or "Set New Intention". Wraps our state setter functions just like the functions above
+  function handleTimerReset() {
+    reset();
+    setTimerInput("45:00");
+    setIntentionText("");
+  }
+
   return (
     <div className='timer-container'>
       <TimeDisplay appStatus={status} timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
@@ -89,7 +96,7 @@ function App() {
           </span>
         )}
 
-        <Controls appStatus={status} onStart={handleStart} onPause={pause} onContinue={resume} onReset={reset} />
+        <Controls appStatus={status} onStart={handleStart} onPause={pause} onContinue={resume} onReset={handleTimerReset} />
         {/* Now with handleStart instead of just start */}
         {/* And now also with the specific onContinue calling resume rather than onStart doing double duty */}
         {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` etc */}
