@@ -1,6 +1,6 @@
 import { APP_STATES } from "../reducers/timerReducer";
 
-const Controls = ({ appStatus, onStart, onPause, onReset }) => {
+const Controls = ({ appStatus, onStart, onPause, onContinue, onReset }) => {
   // Rather than having a ternary waterfall like this which.. it works and it's a good instinctive attempt! But it's quite hard to read and look at
   // {appStatus === APP_STATES.START
   //   ? <button className="control-btn">Lock In</button>
@@ -15,7 +15,7 @@ const Controls = ({ appStatus, onStart, onPause, onReset }) => {
   const mainButtonConfig = {
     [APP_STATES.START]: { text: "Lock In", action: onStart },
     [APP_STATES.RUNNING]: { text: "Pause", action: onPause },
-    [APP_STATES.PAUSED]: { text: "Continue", action: onStart }, // Resuming calls start() too
+    [APP_STATES.PAUSED]: { text: "Continue", action: onContinue }, // "Resuming calls start() too" Not anymore haha! Now has its own dedicated onContinue
     [APP_STATES.END]: { text: "Set New Intention", action: onReset }
   };
 

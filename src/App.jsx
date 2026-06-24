@@ -10,7 +10,7 @@ import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
 
 function App() {
-  const { status, totalSeconds, start, pause, reset } = useTimerEngine();
+  const { status, totalSeconds, start, pause, resume, reset } = useTimerEngine();
   const [timerInput, setTimerInput] = useState("45:00"); // The timer value only in the START state when the user is typing
   const [intentionText, setIntentionText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -89,9 +89,10 @@ function App() {
           </span>
         )}
 
-        <Controls appStatus={status} onStart={handleStart} onPause={pause} onReset={reset} />
+        <Controls appStatus={status} onStart={handleStart} onPause={pause} onContinue={resume} onReset={reset} />
         {/* Now with handleStart instead of just start */}
-        {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` */}
+        {/* And now also with the specific onContinue calling resume rather than onStart doing double duty */}
+        {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` etc */}
       </div>
     </div>
   )

@@ -9,8 +9,9 @@ export const APP_STATES = {
 
 export const APP_ACTIONS = {
   START_TIMER: 'START_TIMER',
-  PAUSE_TIMER: 'PAUSE_TIMER',
   TICK: 'TICK',
+  PAUSE_TIMER: 'PAUSE_TIMER',
+  CONTINUE_TIMER: 'CONTINUE_TIMER',
   FINISH_TIMER: 'FINISH_TIMER',
   RESET_TIMER: 'RESET_TIMER'
 };
@@ -24,8 +25,8 @@ const initialState = {
 export function timerReducer(state, action) {
   switch (action.type) {
     case 'START_TIMER':
-      // Only allow starting if we are currently at START or PAUSED
-      if (state.status === APP_STATES.START || state.status === APP_STATES.PAUSED) {
+      // Only allow starting if we are currently at START. Not PAUSED anymore, it is handled by the new CONTINUE_TIMER action
+      if (state.status === APP_STATES.START) {
         return {
           ...state, // Spread the current state, update keys where needed
           status: APP_STATES.RUNNING, // RUNNING is the new state
@@ -35,6 +36,16 @@ export function timerReducer(state, action) {
         };
       }
       return state; // If the action is called and it would lead to an invalid state (we're already running or at the end screen), we ignore it
+
+    case 'TICK':
+      // Once again: Only allow ticking if we are currently at RUNNING
+      if (state.status === APP_STATES.RUNNING) {
+        return {
+          ...state,
+          totalSeconds: action.payload, // Only updates the seconds amount
+        };
+      }
+      return state;
 
     case 'PAUSE_TIMER':
       // Only allow pausing if we are currently at RUNNING
@@ -46,12 +57,13 @@ export function timerReducer(state, action) {
       }
       return state;
 
-    case 'TICK':
-      // Once again: Only allow ticking if we are currently at RUNNING
-      if (state.status === APP_STATES.RUNNING) {
+    case 'CONTINUE_TIMER':
+      // New action to solve `validatedSeconds` being `undefined` when `start` is called in useTimerEngine upon pressing "Continue"
+      // We only allow the timer to contnue if it is currently at PAUSED
+      if (state.status === APP_STATES.PAUSED) {
         return {
           ...state,
-          totalSeconds: action.payload, // Only updates the seconds amount
+          status: APP_STATES.RUNNING // Does not touch seconds, simply sets the state back to RUNNING
         };
       }
       return state;
