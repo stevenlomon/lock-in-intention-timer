@@ -1,10 +1,11 @@
 import './App.css';
 import { useState } from 'react';
+import { useTimerEngine } from './hooks/useTimerEngine';
+import { APP_STATES } from './reducers/timerReducer';
+import { Validator } from './utils/Validator';
 import TimeDisplay from "./components/TimeDisplay";
 import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
-import { useTimerEngine } from './hooks/useTimerEngine';
-import { APP_STATES } from './reducers/timerReducer';
 
 function App() {
   const { status, totalSeconds, start, pause, reset } = useTimerEngine();
@@ -12,6 +13,21 @@ function App() {
   // For our controlled inputs
   const [timerInput, setTimerInput] = useState("45:00");
   const [intentionText, setIntentionText] = useState("");
+
+  // The `start` function from useTimerEngine expects validated seconds, it doesn't do the validation anymore like in the Vanilla JS version!
+  function handleStart() {
+    // If we are resuming from PAUSED, we don't need to re-validate. 
+    // We just tell the engine to start with the remaining seconds.
+    if (status === APP_STATES.PAUSED) {
+      start(); // Our reducer handles this if payload is undefined!
+      return;
+    }
+
+    const validationResult = Validator.validateInput(timerInput, intentionText);
+
+    // Start with validated seconds!
+    start(validationResult.seconds);
+  }
 
   return (
     <div className='timer-container'>
@@ -41,7 +57,8 @@ function App() {
       </div>
 
       <div className='controls-container'>
-        <Controls appStatus={status} onStart={start} onPause={pause} onReset={reset} />
+        <Controls appStatus={status} onStart={handleStart} onPause={pause} onReset={reset} />
+        {/* Now with handleStart instead of just start */}
         {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` */}
       </div>
     </div>
