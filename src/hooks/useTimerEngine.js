@@ -1,5 +1,5 @@
 import { useState, useEffect, useReducer, useRef } from 'react';
-import { APP_STATES, APP_ACTIONS, timerReducer } from "./../reducers/timerReducer"; 
+import { APP_STATES, APP_ACTIONS, timerReducer } from "./../reducers/timerReducer";
 import { StorageManager } from "./../utils/StorageManager";
 import { AudioEngine } from "./../utils/AudioEngine";
 
@@ -8,10 +8,16 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
   // const [isRunning, setIsRunning] = useState(false);
   // const [isEndScreen, setIsEndScreen] = useState(false);
   // These three state variables are now replaced with our new reducer handling the state!
-  const [state, dispatch] = useReducer(timerReducer, {
-    status: APP_STATES.START,
-    totalSeconds: initialSeconds
-  });
+  const [state, dispatch] = useReducer(timerReducer,
+    // For the initial state, first check localStorage for a stored intention and seconds!
+    StorageManager.load(StorageManager.INTENTION_KEY) && StorageManager.load(StorageManager.SECONDS_KEY)
+      ? {
+        status: APP_STATES.PAUSED,
+        totalSeconds: parseInt(StorageManager.load(StorageManager.SECONDS_KEY)) // Important, don't forget to parse from string to int
+      } : {
+        status: APP_STATES.START,
+        totalSeconds: initialSeconds
+      });
 
   const endTimeRef = useRef(null); // Will be refered to both in the useEffect and the start function so it's used to solve a scope issue here
 
@@ -31,12 +37,12 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
       const newSeconds = Math.max(0, Math.ceil(msRemaining / 1000));
       dispatch({ type: APP_ACTIONS.TICK, payload: newSeconds }); // We're not allowed to mutate state like `state.totalSeconds = Math.max(0, Math.ceil(msRemaining / 1000));` in React! *In React, state is strictly immutable* State is updated only via state setters, which is dispatch in this scenario
 
-      StorageManager.save(StorageManager.SECONDS_KEY, state.totalSeconds);
+      StorageManager.save(StorageManager.SECONDS_KEY, newSeconds); // Not `state.totalSeconds`, that's a stale value due to closure! newSeconds
 
       // Our stop condition `if (StateBuffer.totalSeconds <= 0) {` translated!
       if (newSeconds <= 0) { // We can't use state.totalSeconds here due to JavaScript closures! It's a "stale" value
-        dispatch( {type: APP_ACTIONS.FINISH_TIMER }); // Replaces 5 lines of code haha!
-        
+        dispatch({ type: APP_ACTIONS.FINISH_TIMER }); // Replaces 5 lines of code haha!
+
         StorageManager.clearSession();
         AudioEngine.playDing(); // Stays exactly the same!
       }
@@ -49,11 +55,13 @@ export function useTimerEngine(initialSeconds = 2700) { // Using our default 45 
 
   // Our start, pause and reset methods, now as functions
   // And now furthermore with our reducer, functions that call dispatch to the reducer! The reducer defines the actions, here's where we define the functions that use the actions
-  const start = (validatedSeconds) => {
+  const start = (validatedSeconds, validatedIntention) => {
     // The translation of this line of code from the Vanilla JS version `StateBuffer.endTime = Date.now() + (StateBuffer.totalSeconds * 1000);` becomes...
     endTimeRef.current = Date.now() + validatedSeconds * 1000; // Absolute end time in milliseconds. With our new CONTINUE_TIMER action, validatedSeconds is never undefined here anymore causing NaN cascades
-    
+
     dispatch({ type: APP_ACTIONS.START_TIMER, payload: validatedSeconds });
+    StorageManager.save(StorageManager.SECONDS_KEY, validatedSeconds);
+    StorageManager.save(StorageManager.INTENTION_KEY, validatedIntention);
   };
 
   const pause = () => {

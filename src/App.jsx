@@ -5,14 +5,22 @@ import { APP_STATES } from './reducers/timerReducer';
 import { Validator } from './utils/Validator';
 import { TimeParser } from './utils/TimeParser';
 import { TimeFormatter } from './utils/TimeFormatter';
+import { StorageManager } from './utils/StorageManager';
 import TimeDisplay from "./components/TimeDisplay";
 import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
 
 function App() {
   const { status, totalSeconds, start, pause, resume, reset } = useTimerEngine();
-  const [timerInput, setTimerInput] = useState("45:00"); // The timer value only in the START state when the user is typing
-  const [intentionText, setIntentionText] = useState("");
+
+  const [timerInput, setTimerInput] = useState(() => {  // The timer value only in the START state when the user is typing
+    const saved = StorageManager.load(StorageManager.SECONDS_KEY);
+    return saved ? TimeFormatter.formatTime(saved) : "45:00";
+  });
+  const [intentionText, setIntentionText] = useState(() => {
+    return StorageManager.load(StorageManager.INTENTION_KEY) || "";
+  });
+
   const [errorMessage, setErrorMessage] = useState("");
   const [showWarning, setShowWarning] = useState(false);
 
@@ -33,8 +41,8 @@ function App() {
       return;
     }
 
-    // Start with validated seconds!
-    start(validationResult.seconds);
+    // Start with validated and parsed seconds! And now also validated intention! Both stored in localStorage upon starting the timer
+    start(validationResult.seconds, intentionText);
     setErrorMessage("");
   };
 
