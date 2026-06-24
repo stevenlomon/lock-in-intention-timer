@@ -12,6 +12,6 @@ const TimeDisplay = ({ timerValue, onTimerEdit }) => {
       {timerValue ? timerValue : "45:00"}
     </div>
   )
-}
+};
 
-export default TimeDisplay
+export default TimeDisplay;

@@ -10,6 +10,6 @@ const IntentionInput = ({ intentionValue, onIntentionEdit }) => {
       onChange={(e) => onIntentionEdit(e.target.value)}
     />
   )
-}
+};
 
-export default IntentionInput
+export default IntentionInput;

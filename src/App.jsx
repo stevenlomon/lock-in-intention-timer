@@ -41,7 +41,7 @@ function App() {
       </div>
 
       <div className='controls-container'>
-        <Controls appStatus={status} />
+        <Controls appStatus={status} onStart={start} onPause={pause} onReset={reset} />
         {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` */}
       </div>
     </div>
