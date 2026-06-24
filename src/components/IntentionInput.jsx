@@ -1,5 +1,3 @@
-import React from 'react'
-
 const IntentionInput = ({ intentionValue, onIntentionEdit }) => {
   return (
     <textarea
