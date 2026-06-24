@@ -4,13 +4,14 @@ import { useTimerEngine } from './hooks/useTimerEngine';
 import { APP_STATES } from './reducers/timerReducer';
 import { Validator } from './utils/Validator';
 import { TimeParser } from './utils/TimeParser';
+import { TimeFormatter } from './utils/TimeFormatter';
 import TimeDisplay from "./components/TimeDisplay";
 import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
 
 function App() {
   const { status, totalSeconds, start, pause, reset } = useTimerEngine();
-  const [timerInput, setTimerInput] = useState("45:00");
+  const [timerInput, setTimerInput] = useState("45:00"); // The timer value only in the START state when the user is typing
   const [intentionText, setIntentionText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showWarning, setShowWarning] = useState(false);
@@ -52,8 +53,9 @@ function App() {
 
   return (
     <div className='timer-container'>
-      <TimeDisplay timerValue={timerInput} onTimerEdit={handleTimerEdit} />
+      <TimeDisplay timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
       {/* Now with handleTimerEdit instead of setTimerInput. No changes needed in TimeDisplay! */}
+      {/* And now also with a conditional timerValue!! timerInput only when the user is typing, the formatted totalSeconds from the engine once the engine is running! */}
       {/* For debugging purposes only: timer value is currently {timerInput} */}
 
       <div className='intention-container'>
