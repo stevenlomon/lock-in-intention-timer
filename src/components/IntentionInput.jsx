@@ -1,6 +1,6 @@
 import { APP_STATES } from "../reducers/timerReducer";
 
-const IntentionInput = ({ appStatus, intentionValue, onIntentionEdit }) => {
+const IntentionInput = ({ appStatus, intentionValue, onIntentionEdit, onStart }) => {
   return (
     <textarea
       className="intention-input"
@@ -11,6 +11,15 @@ const IntentionInput = ({ appStatus, intentionValue, onIntentionEdit }) => {
       value={intentionValue}
       onChange={(e) => onIntentionEdit(e.target.value)}
       disabled={appStatus === APP_STATES.START ? false : true}
+
+      // Prevent 'Enter' from creating a newline and instead have it start the timer! (if valid intention input)
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault(); // Prevent the default of creating a newline
+          e.currentTarget.blur(); // Remove focus, good for mobile so that the keyboard disappears
+          onStart(); // Start the timer!
+        }
+      }}
     />
   )
 };

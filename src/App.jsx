@@ -90,7 +90,7 @@ function App() {
               )
             }
         </label>
-        <IntentionInput appStatus={status} intentionValue={intentionText} onIntentionEdit={setIntentionText} />
+        <IntentionInput appStatus={status} intentionValue={intentionText} onIntentionEdit={setIntentionText} onStart={handleStart} />
         {/* For debugging purposes only: intention value is currently {intentionText} */}
 
       </div>
