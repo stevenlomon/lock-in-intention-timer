@@ -9,6 +9,7 @@ import { StorageManager } from './utils/StorageManager';
 import TimeDisplay from "./components/TimeDisplay";
 import IntentionInput from './components/IntentionInput';
 import Controls from "./components/Controls";
+import ConfirmModal from './components/ConfirmModal';
 
 function App() {
   const { status, totalSeconds, start, pause, resume, reset } = useTimerEngine();
@@ -23,6 +24,7 @@ function App() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [showWarning, setShowWarning] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // The `start` function from useTimerEngine expects validated seconds, it doesn't do the validation anymore like in the Vanilla JS version!
   function handleStart() {
@@ -57,7 +59,7 @@ function App() {
     const parsedSeconds = TimeParser.parseToSeconds(newText);
 
     // ..and if it's above 3600 (an hour), we display the warning message!
-    setShowWarning(parsedSeconds > 3600); 
+    setShowWarning(parsedSeconds > 3600);
   };
 
   // UX improvement: reset the UI when hitting "Reset" or "Set New Intention". Wraps our state setter functions just like the functions above
@@ -66,53 +68,77 @@ function App() {
     setTimerInput("45:00");
     setIntentionText("");
     setShowWarning(false); // Just in case
+    setIsModalOpen(false); // Close the modal upon successful reset
   }
 
   return (
-    <div className='timer-container'>
-      <TimeDisplay appStatus={status} timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
-      {/* Now with handleTimerEdit instead of setTimerInput. No changes needed in TimeDisplay! */}
-      {/* And now also with a conditional timerValue!! timerInput only when the user is typing, the formatted totalSeconds from the engine once the engine is running! */}
-      {/* For debugging purposes only: timer value is currently {timerInput} */}
+    <>
+      {/* The new confirm modal. It listens to the state, and knows exactly what functions to fire */}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onCancel={() => {
+          setIsModalOpen(false)
+          resume(); // Since opening the modal pauses the timer engine, closing the modal now also needs to have it continue! (for optimal ui, we could let the user land back to the timer and click "Continue" themselves but nah)
+        }}
+        onConfirm={handleTimerReset}
+      />
 
-      <div className='intention-container'>
-        <label className='intention-prompt'>
-          {status === APP_STATES.START
-            ? 'What is your intention for these low-distraction focus minutes?'
-            : status === APP_STATES.RUNNING || status === APP_STATES.PAUSED
-            ? 'Good Luck! 🌱✨'
-            : ( 
-              // If the code reaches here - if it's not START, not RUNNING and not PAUSED, we can safely say it's END
-              <>
-                  The minutes have passed.<br />
-                  Did you complete the intention you set?<br />
-                  Take a few moments to reflect on your estimation ability.<br />
-                  It's all feedback for growth and self discovery 🌱
-                </>
-              )
+      <div className='timer-container'>
+
+        <TimeDisplay appStatus={status} timerValue={status === APP_STATES.START ? timerInput : TimeFormatter.formatTime(totalSeconds)} onTimerEdit={handleTimerEdit} />
+        {/* Now with handleTimerEdit instead of setTimerInput. No changes needed in TimeDisplay! */}
+        {/* And now also with a conditional timerValue!! timerInput only when the user is typing, the formatted totalSeconds from the engine once the engine is running! */}
+        {/* For debugging purposes only: timer value is currently {timerInput} */}
+
+        <div className='intention-container'>
+          <label className='intention-prompt'>
+            {status === APP_STATES.START
+              ? 'What is your intention for these low-distraction focus minutes?'
+              : status === APP_STATES.RUNNING || status === APP_STATES.PAUSED
+                ? 'Good Luck! 🌱✨'
+                : (
+                  // If the code reaches here - if it's not START, not RUNNING and not PAUSED, we can safely say it's END
+                  <>
+                    The minutes have passed.<br />
+                    Did you complete the intention you set?<br />
+                    Take a few moments to reflect on your estimation ability.<br />
+                    It's all feedback for growth and self discovery 🌱
+                  </>
+                )
             }
-        </label>
-        <IntentionInput appStatus={status} intentionValue={intentionText} onIntentionEdit={setIntentionText} onStart={handleStart} />
-        {/* For debugging purposes only: intention value is currently {intentionText} */}
+          </label>
+          <IntentionInput appStatus={status} intentionValue={intentionText} onIntentionEdit={setIntentionText} onStart={handleStart} />
+          {/* For debugging purposes only: intention value is currently {intentionText} */}
 
+        </div>
+
+        <div className='controls-container'>
+          {/* We always render these to hold the physical space, conditionally toggling our .invisible class instead of conditional rendering */}
+          <span className={`intention-prompt error-display ${errorMessage ? '' : 'invisible'}`}>
+            {errorMessage}
+          </span>
+
+          <span className={`intention-prompt warning-display ${showWarning ? '' : 'invisible'}`}>
+            It is recommended to keep your focus sessions to 60 minutes or less per session
+          </span>
+
+          <Controls
+            appStatus={status}
+            onStart={handleStart}
+            onPause={pause}
+            onContinue={resume}
+            onReset={() => {
+              pause(); // Freeze the timer engine before the modal opens!
+              setIsModalOpen(true);
+            }}
+          />
+          {/* Now with handleStart instead of just start */}
+          {/* And now also with the specific onContinue calling resume rather than onStart doing double duty */}
+          {/* And now as a final change also doesn't call handleReset directly onReset but rather opens the modal! */}
+          {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` etc */}
+        </div>
       </div>
-
-      <div className='controls-container'>
-        {/* We always render these to hold the physical space, conditionally toggling our .invisible class instead of conditional rendering */}
-        <span className={`intention-prompt error-display ${errorMessage ? '' : 'invisible'}`}>
-          {errorMessage}
-        </span>
-        
-        <span className={`intention-prompt warning-display ${showWarning ? '' : 'invisible'}`}>
-          It is recommended to keep your focus sessions to 60 minutes or less per session
-        </span>
-
-        <Controls appStatus={status} onStart={handleStart} onPause={pause} onContinue={resume} onReset={handleTimerReset} />
-        {/* Now with handleStart instead of just start */}
-        {/* And now also with the specific onContinue calling resume rather than onStart doing double duty */}
-        {/* Tested with `<Controls appStatus={APP_STATES.RUNNING} />`, `<Controls appStatus={APP_STATES.PAUSED} />` etc */}
-      </div>
-    </div>
+    </>
   )
 };
 
