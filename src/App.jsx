@@ -44,6 +44,7 @@ function App() {
     // Start with validated and parsed seconds! And now also validated intention! Both stored in localStorage upon starting the timer
     start(validationResult.seconds, intentionText);
     setErrorMessage("");
+    setShowWarning(false); // If it's true when the timer starts, we don't want it showing then the user is in Focus mode haha, let them focus
   };
 
   // This functions triggers upon the `onBlur` in TimeDisplay; the direct equivalent to the `timeDisplay.addEventListener('blur', () => {` line that altered my brain chemistry in the Vanilla VS version haha
@@ -64,6 +65,7 @@ function App() {
     reset();
     setTimerInput("45:00");
     setIntentionText("");
+    setShowWarning(false); // Just in case
   }
 
   return (
