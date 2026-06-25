@@ -23,7 +23,8 @@ const Controls = ({ appStatus, onStart, onPause, onContinue, onReset }) => {
   const { text, action } = mainButtonConfig[appStatus];
 
   return (
-    <div>
+    // Apparently using a React fragment here instead of <div> is what allows the two buttons to be above and under each other rather than next to each other haha!
+    <> 
       {/* The Main Button */}
       <button className="control-btn" onClick={action}>
         {text}
@@ -35,7 +36,7 @@ const Controls = ({ appStatus, onStart, onPause, onContinue, onReset }) => {
           Reset
         </button>
       )}
-    </div>
+    </>
   )
 };
 
