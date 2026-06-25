@@ -96,13 +96,14 @@ function App() {
       </div>
 
       <div className='controls-container'>
-        {errorMessage && <span className='intention-promp error-display'>{errorMessage}</span>}
+        {/* We always render these to hold the physical space, conditionally toggling our .invisible class instead of conditional rendering */}
+        <span className={`intention-prompt error-display ${errorMessage ? '' : 'invisible'}`}>
+          {errorMessage}
+        </span>
         
-        {showWarning && (
-          <span className='intention-prompt warning-display'>
-            It is recommended to keep your focus sessions to 60 minutes or less per session
-          </span>
-        )}
+        <span className={`intention-prompt warning-display ${showWarning ? '' : 'invisible'}`}>
+          It is recommended to keep your focus sessions to 60 minutes or less per session
+        </span>
 
         <Controls appStatus={status} onStart={handleStart} onPause={pause} onContinue={resume} onReset={handleTimerReset} />
         {/* Now with handleStart instead of just start */}
