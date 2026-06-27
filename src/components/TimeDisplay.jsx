@@ -50,7 +50,7 @@ const TimeDisplay = ({ appStatus, timerValue, onTimerEdit }) => {
         }
       }}
     >
-      {timerValue ? timerValue : "45:00"}
+      {timerValue}
     </div>
   )
 };
