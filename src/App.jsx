@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTimerEngine } from './hooks/useTimerEngine';
 import { APP_STATES } from './reducers/timerReducer';
 import { Validator } from './utils/Validator';
@@ -70,6 +70,35 @@ function App() {
     setShowWarning(false); // Just in case
     setIsModalOpen(false); // Close the modal upon successful reset
   }
+
+  // UX improvement: Global shortcuts! 'Enter' to start (when the Intention textarea is not the main active element!), 'Space' to pause/resume
+  useEffect(() => {
+    const handleGlobalShortcuts = (e) => {
+      // Guard: We ONLY want global shortcuts if there is currently no active element, i.e. user is currently typing their intention
+      if (document.activeElement !== document.body) return;
+
+      // Enter key: Lock In. Only if app state is START
+      if (e.key === 'Enter' && status === APP_STATES.START) {
+        handleStart();
+      }
+
+      // Spacebar key: Pause/Continue. Only if app state is RUNNING/PAUSED
+      if (e.code === 'Space') { // No `e.key`, but `e.code`! I've never seen this before. See related PR for the "Why"
+        if (status === APP_STATES.RUNNING) {
+          pause();
+        } else if (status === APP_STATES.PAUSED) {
+          resume();
+        }
+      }
+    }
+
+    // Attach the 'keydown' eventListener to window (no element in focus)
+    window.addEventListener('keydown', handleGlobalShortcuts);
+
+    // Essential clean-up function
+    return () => window.removeEventListener('keydown', handleGlobalShortcuts);
+
+  }, [status, handleStart, pause, resume]); // Run if status changes or if any of the functions we use in the useEffect are re-created with fresh data
 
   return (
     <>
