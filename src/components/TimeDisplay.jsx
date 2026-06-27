@@ -9,7 +9,19 @@ const TimeDisplay = ({ appStatus, timerValue, onTimerEdit }) => {
       spellCheck={false}
       // onChange={(e) => onTimerEdit(e.target.value)} This that is ingrained in my muscle memory at this poitn would be valid.. if we had an input! But here we have a div
       // onInput={(e) => onTimerEdit(e.currentTarget.textContent)} This... is technically valid but completely unusable due to the cursor flickering haha
-      onBlur={(e) => onTimerEdit(e.currentTarget.textContent)} // And so this is what we end up with! Only update timerInput when the user clicks away (blur) or hits Enter!
+      onBlur={(e) => { // And so this is what we end up with! Only update timerInput when the user clicks away (blur) or hits Enter!
+        // NEW: Extra code to ensure that the textNode never is destroyed if the user removes all text and clicks away
+        let currentText = e.currentTarget.textContent.trim();
+
+        // If the user completely wiped the div, the browser would destroy the TextNode.
+        if (!currentText) {
+          currentText = "45:00"; // Our fallback
+          e.currentTarget.textContent = currentText; // Forcefully rebuild the physical DOM node!
+        }
+
+        // Now we pass the guaranteed safe string up to React
+        onTimerEdit(currentText);
+      }} 
 
       // Our Vanilla JS "Firewall" equivalent! Everything up to the 'Enter' special case completely unedited!
       onKeyDown={(e) => {
