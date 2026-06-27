@@ -128,8 +128,12 @@ function App() {
             onPause={pause}
             onContinue={resume}
             onReset={() => {
-              pause(); // Freeze the timer engine before the modal opens!
-              setIsModalOpen(true);
+              if (status !== APP_STATES.END) {
+                pause(); // Freeze the timer engine before the modal opens!
+                setIsModalOpen(true);
+              } else {
+                handleTimerReset(); // If the app state is END, we don't need a confirmation. Simply reset the timer
+              }
             }}
           />
           {/* Now with handleStart instead of just start */}
